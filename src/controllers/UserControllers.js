@@ -27,58 +27,40 @@ class UserController {
 
     }
     /* ----- REVISAR ----- */
-    async update(req, res) {
-        const { name, email, old_password, new_password } = req.body
+    async update(request, response) {
+       
+        const { name, email, password, new_password } = request.body
         const user_id = request.user.id
 
-        const userExists = await knex("users").where({ user_id }).first()
-        if (!userExists) {
-            throw new AppError("Usuario não encontrado!")
+        const userExists = await knex('users').where({ email })
+        
+        if (userExists.length === 1 && userExists[0].id !== user_id) {
+            throw new AppError('Email já cadastrado!')
         }
 
-        const emailExists = await knex("users").where({ email }).first()
-        if (emailExists) {
-            throw new AppError("Este email já esta em uso.")
+        if (password && new_password) {
+            const validUserPassword = await knex
+            .select('password')
+            .from('users')
+            .where('id', user_id)
+
+            const checkOldPassword = await compare(password, validUserPassword[0].password)
+            
+            const att_password = await hash(new_password, 8)
+            
+            if (!checkOldPassword) {
+                throw new AppError('A senha antiga não confere.')
+            }
+
+            await knex('users').where('id', user_id).update({ password: att_password })
         }
 
-        if (!old_password && new_password) {
-            throw new AppError("Favor informar a senha antiga para alterar sua senha.")
-        }
-
-        const validUserPassword = await knex
-            .select("password")
-            .from("users")
-            .where({ user_id })
-
-        if (old_password && new_password) {
-            validUserPassword
-        }
-
-        const matchCurrentPasswordWithNewPassword =
-            await compare(old_password, validUserPassword[0].password)
-
-        if (!matchCurrentPasswordWithNewPassword) {
-            throw new AppError("A senha antiga nao confere.")
-        }
-
-        const newHashedPassword = await hash(new_password, 8)
-
-        await knex("users").where({ user_id }).update({
-            password: newHashedPassword
+        await knex('users').where('id', user_id).update({
+        name,
+        email
         })
 
-        await knex("users").where({ user_id }).update({
-            name,
-            email
-        })
-
-        await knex("users")
-            .update({
-                updated_at: knex.fn.now()
-            })
-            .where('id', user_id);
-
-        return res.json()
+        return response.json()
     }
 
 
