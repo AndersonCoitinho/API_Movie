@@ -29,9 +29,9 @@ class UserController {
     /* ----- REVISAR ----- */
     async update(req, res) {
         const { name, email, old_password, new_password } = req.body
-        const { id } = req.params;
+        const user_id = request.user.id
 
-        const userExists = await knex("users").where({ id }).first()
+        const userExists = await knex("users").where({ user_id }).first()
         if (!userExists) {
             throw new AppError("Usuario não encontrado!")
         }
@@ -48,7 +48,7 @@ class UserController {
         const validUserPassword = await knex
             .select("password")
             .from("users")
-            .where({ id })
+            .where({ user_id })
 
         if (old_password && new_password) {
             validUserPassword
@@ -63,11 +63,11 @@ class UserController {
 
         const newHashedPassword = await hash(new_password, 8)
 
-        await knex("users").where({ id }).update({
+        await knex("users").where({ user_id }).update({
             password: newHashedPassword
         })
 
-        await knex("users").where({ id }).update({
+        await knex("users").where({ user_id }).update({
             name,
             email
         })
@@ -76,7 +76,7 @@ class UserController {
             .update({
                 updated_at: knex.fn.now()
             })
-            .where('id', id);
+            .where('id', user_id);
 
         return res.json()
     }
