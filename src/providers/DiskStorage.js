@@ -1,6 +1,7 @@
 const fs = require("fs")/*usado para trabalhar e manipular arquivos*/
 const path = require("path")
 const uploadConfig = require("../configs/upload")
+
 class DiskStorage {
     async saveFile(file){
         await fs.promises.rename(/*rename serve para renomear ou mover o arquivo*/
