@@ -4,16 +4,7 @@ const AppError = require("../utils/AppError")
 class NotesController {
     async create(req, res) {
         const { title, description, rating } = req.body
-        const { user_id } = req.params;
-
-        const validUser = await knex('users')
-            .where('id', user_id)
-
-        if (validUser.length === 0) {
-            throw new AppError(
-                'Nao foi possivel criar a nota, usuario nao encontrado'
-            )
-        }
+        const user_id = req.user.id;
 
         if (rating < 0 || rating > 5) {
             throw new AppError("A nota precisar ser entre zero e cinco.");
