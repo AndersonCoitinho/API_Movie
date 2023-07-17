@@ -3,10 +3,13 @@ const knex = require("../database/knex");
 
 const { hash, compare } = require("bcryptjs")
 
+const UserRepository = require("../repositories/UserRepository")
 
 class UserController {
     async create(req, res) {
         const { name, email, password, avatar } = req.body
+
+        const userRepository = new UserRepository();
 
         const hashedPassword = await hash(password, 8); /*criptrografando senha*/
 
