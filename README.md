@@ -24,8 +24,6 @@
 
 <h2 id="usage">🚀 Utilização</h2>
 
-> A aplicação RocketMovies está disponível para utilização [aqui](https://moviessave.netlify.app/).
-
 > Para executar em sua máquina localmente, clone o projeto, acesse a pasta, instale as dependências e inicie o servidor.
 
 ```
